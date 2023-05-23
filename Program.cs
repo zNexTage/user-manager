@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UserManager.Data;
 using UserManager.Models;
+using UserManager.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,14 @@ builder.Services
 .AddDefaultTokenProviders();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+//Configuration of dependecy injection:
+
+//builder.Services.AddScoped -> Create an instance when a request ocurrs.
+//builder.Services.AddTransient -> ...
+//builder.Services.AddSingleton -> Create an unique instance for each request
+
+builder.Services.AddScoped<CreateUserService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

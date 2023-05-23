@@ -1,9 +1,6 @@
-using System;
-using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using UserManager.Data.DTO;
-using UserManager.Models;
+using UserManager.Service;
 
 namespace UserManager.Controller;
 
@@ -11,25 +8,21 @@ namespace UserManager.Controller;
 [Route("[Controller]")]
 public class UserController : ControllerBase
 {
-    private IMapper _mapper;
-    private UserManager<User> _userManager;
+    private CreateUserService _createUserService;
 
-    public UserController(IMapper mapper, UserManager<User> userManager)
+    public UserController(CreateUserService createUserService)
     {
-        this._mapper = mapper;
-        this._userManager = userManager;
+        _createUserService = createUserService;
     }
 
     [HttpPost]
     public async Task<IActionResult> Register(CreateUserDTO userDTO){
-        User user = _mapper.Map<User>(userDTO);
-
-        /* Using await, we don't have to set the var type to Task<T>; We can set the var with type T  */
-        IdentityResult result = await _userManager.CreateAsync(user, userDTO.Password);
+        
+        var result = await _createUserService.execute(userDTO);
 
         if(result.Succeeded){
-            return Ok("Usuário cadastrado com sucesso");
-        }
+            return Ok("Usuário criado com sucesso");
+        } 
 
         return BadRequest(result.Errors);
     }
