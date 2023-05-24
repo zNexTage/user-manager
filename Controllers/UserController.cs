@@ -8,22 +8,33 @@ namespace UserManager.Controller;
 [Route("[Controller]")]
 public class UserController : ControllerBase
 {
-    private CreateUserService _createUserService;
+    private UserService _userService;
 
-    public UserController(CreateUserService createUserService)
+    public UserController(UserService userService)
     {
-        _createUserService = createUserService;
+        _userService = userService;
     }
 
-    [HttpPost]
+    [HttpPost("Register")]
     public async Task<IActionResult> Register(CreateUserDTO userDTO){
         
-        var result = await _createUserService.execute(userDTO);
+        var result = await _userService.Create(userDTO);
 
         if(result.Succeeded){
             return Ok("Usuário criado com sucesso");
         } 
 
         return BadRequest(result.Errors);
+    }
+
+    [HttpPost("Login")]
+    public async Task<IActionResult> Login([FromBody] LoginDTO loginDto){
+        var result = await _userService.Login(loginDto);
+
+        if(!result.Succeeded){
+            return Unauthorized("Verify your credentials");
+        }
+
+        return Ok();
     }
 }
