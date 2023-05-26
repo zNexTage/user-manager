@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using UserManager.Data.DTO;
 using UserManager.Service;
@@ -9,10 +10,12 @@ namespace UserManager.Controller;
 public class UserController : ControllerBase
 {
     private UserService _userService;
+    private TokenService _tokenService;
 
-    public UserController(UserService userService)
+    public UserController(UserService userService, TokenService tokenService)
     {
         _userService = userService;
+        _tokenService = tokenService;
     }
 
     [HttpPost("Register")]
@@ -29,12 +32,17 @@ public class UserController : ControllerBase
 
     [HttpPost("Login")]
     public async Task<IActionResult> Login([FromBody] LoginDTO loginDto){
-        var result = await _userService.Login(loginDto);
+        try{
+            var token = await _userService.Login(loginDto);
 
-        if(!result.Succeeded){
-            return Unauthorized("Verify your credentials");
+            var response = new {
+                Token=token
+            };
+
+            return Ok(response);
         }
-
-        return Ok();
+        catch(Exception err){
+            return Unauthorized(err.Message);
+        }
     }
 }

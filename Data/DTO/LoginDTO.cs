@@ -9,4 +9,12 @@ public class LoginDTO
     public string UserName { get; set; }
     [Required]
     public string Password { get; set; }
+
+    public string NormalizedUserName
+    {
+        get
+        {
+            return UserName.ToUpper();
+        }
+    }
 }

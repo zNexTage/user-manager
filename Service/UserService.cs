@@ -12,14 +12,18 @@ public class UserService
     private UserManager<User> _userManager;
     private SignInManager<User> _signInManager;
 
+    private TokenService _tokenService;
+
     public UserService(IMapper mapper,
      UserManager<User> userManager,
-     SignInManager<User> signInManager
+     SignInManager<User> signInManager,
+     TokenService tokenService
      )
     {
         this._mapper = mapper;
         this._userManager = userManager;
         this._signInManager = signInManager;
+        this._tokenService = tokenService;
     }
 
     public async Task<IdentityResult> Create(CreateUserDTO userDTO)
@@ -30,7 +34,7 @@ public class UserService
         return await _userManager.CreateAsync(user, userDTO.Password);
     }
 
-    public async Task<SignInResult> Login(LoginDTO loginDTO)
+    public async Task<string> Login(LoginDTO loginDTO)
     {
         var result = await _signInManager.PasswordSignInAsync(
             loginDTO.UserName, 
@@ -39,6 +43,13 @@ public class UserService
             false // lockoutOnFailure -> we set it to false; We dont't want to block the account when the login fail.
         );
 
-        return result;
+        if(!result.Succeeded){
+            throw new Exception("Não foi possível realizar o login! Verifique as credenciais informadas.");
+        }
+
+        var user = _signInManager.UserManager.Users.FirstOrDefault(user => 
+        user.NormalizedUserName == loginDTO.NormalizedUserName)!;
+
+        return _tokenService.GenerateToken(user);
     }
 }
