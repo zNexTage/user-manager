@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using UserManager.Authorization;
 using UserManager.Data;
 using UserManager.Models;
 using UserManager.Service;
@@ -34,10 +36,19 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<TokenService>();
 
+// dependency injection of age authorization;
+builder.Services.AddSingleton<IAuthorizationHandler, AgeAuthorization>();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAuthorization(options => {
+    options.AddPolicy("MinAge", policy => {
+        policy.AddRequirements(new MinAge(18));
+    });
+}); // Config a authorization policy
 
 var app = builder.Build();
 
