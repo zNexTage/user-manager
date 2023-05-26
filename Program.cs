@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +6,9 @@ using UserManager.Authorization;
 using UserManager.Data;
 using UserManager.Models;
 using UserManager.Service;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using UserManager.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +48,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var userSettings = builder.Configuration.GetSection("User").Get<UserSettings>();
+
+builder.Services.AddAuthentication(options => {
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options => {
+    options.TokenValidationParameters = new TokenValidationParameters {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(userSettings.TokenKey)),
+        ValidateAudience = false,
+        ValidateIssuer = false,
+        ClockSkew = TimeSpan.Zero,
+    };
+});
+
 builder.Services.AddAuthorization(options => {
     options.AddPolicy("MinAge", policy => {
         policy.AddRequirements(new MinAge(18));
@@ -60,6 +78,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

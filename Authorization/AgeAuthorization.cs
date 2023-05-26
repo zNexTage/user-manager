@@ -25,6 +25,7 @@ public class AgeAuthorization : AuthorizationHandler<MinAge>
 
         if(age >= requirement.Age){
             context.Succeed(requirement);
+            return Task.CompletedTask;
         }
 
         context.Fail();
