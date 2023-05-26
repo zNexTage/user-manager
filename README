@@ -1,0 +1,13 @@
+# User Manager API
+
+## Sobre o projeto
+API para demonstrar o processo de cadastro e login de usuário. Além disso, foi utilizado autenticação com Token JWT. 
+
+## O que foi utilizado para o desenvolvimento?
+- .NET Core 6;
+- MySQL;
+- C#;
+- EntityFramework;
+- TokenJWT;
+
+
