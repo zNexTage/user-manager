@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-var connectionString = builder.Configuration.GetConnectionString("UserMysqlConnection")!;
+var connectionString = builder.Configuration["ConnectionStrings:UserMysqlConnection"];
 
 builder.Services.AddDbContext<UserDbContext>(
     (opts =>{
